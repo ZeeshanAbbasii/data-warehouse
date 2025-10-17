@@ -1,0 +1,19 @@
+{
+  "name": "hello-world-website",
+  "version": "1.0.0",
+  "description": "A simple website with Hello World and backend database connection",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": ["hello-world", "backend", "database"],
+  "author": "User",
+  "license": "MIT"
+}

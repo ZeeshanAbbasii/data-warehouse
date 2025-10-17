@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Data Warehouse Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-database"></i>
+            <span>AI Data Warehouse</span>
+        </div>
+        <div class="nav-links">
+            <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="#users" class="nav-link" data-section="users">
+                <i class="fas fa-users"></i> Users
+            </a>
+            <a href="#transactions" class="nav-link" data-section="transactions">
+                <i class="fas fa-shopping-cart"></i> Transactions
+            </a>
+            <a href="#products" class="nav-link" data-section="products">
+                <i class="fas fa-box"></i> Products
+            </a>
+            <a href="#tickets" class="nav-link" data-section="tickets">
+                <i class="fas fa-ticket-alt"></i> Support Tickets
+            </a>
+            <a href="#analytics" class="nav-link" data-section="analytics">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </a>
+            <a href="#sessions" class="nav-link" data-section="sessions">
+                <i class="fas fa-clock"></i> Sessions
+            </a>
+        </div>
+        <div class="nav-status">
+            <span id="db-status" class="status-indicator">
+                <i class="fas fa-circle"></i> Database
+            </span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="section-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h2>
+                <button class="refresh-btn" onclick="loadDashboardData()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card users-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-users">-</h3>
+                        <p>Total Users</p>
+                    </div>
+                </div>
+
+                <div class="stat-card transactions-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-transactions">-</h3>
+                        <p>Total Transactions</p>
+                    </div>
+                </div>
+
+                <div class="stat-card revenue-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-revenue">$0.00</h3>
+                        <p>Total Revenue</p>
+                    </div>
+                </div>
+
+                <div class="stat-card products-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-products">-</h3>
+                        <p>Total Products</p>
+                    </div>
+                </div>
+
+                <div class="stat-card tickets-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-tickets">-</h3>
+                        <p>Support Tickets</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                <div class="activity-grid">
+                    <!-- Recent Users -->
+                    <div class="activity-card">
+                        <h4>Recent Users</h4>
+                        <div id="recent-users" class="activity-list">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="activity-card">
+                        <h4>Recent Transactions</h4>
+                        <div id="recent-transactions" class="activity-list">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Tickets -->
+                    <div class="activity-card">
+                        <h4>Recent Support Tickets</h4>
+                        <div id="recent-tickets" class="activity-list">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> Analytics & Insights</h2>
+                <button class="refresh-btn" onclick="loadAnalyticsData()">
+                    <i class="fas fa-sync-alt"></i> Refresh Charts
+                </button>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <!-- Bar Chart: Users per Month -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-bar"></i> User Registrations by Month</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="usersPerMonthChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pie Chart: Users by Country -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-pie"></i> User Distribution by Country</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="usersByCountryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Line Chart: Activity Trends -->
+                <div class="chart-container full-width">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-line"></i> Activity Trends Over Time</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="activityTrendsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Product Performance Charts -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-shopping-cart"></i> Top Performing Products</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="productPerformanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Product Categories Distribution -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-pie"></i> Product Categories Performance</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="productCategoriesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Website Load Times -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-tachometer-alt"></i> Website Load Times</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="websiteLoadTimesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Entries Table -->
+                <div class="chart-container full-width">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-list"></i> Recent Activity</h3>
+                    </div>
+                    <div class="recent-entries-container">
+                        <div id="recent-entries-loading" class="loading">Loading recent activity...</div>
+                        <div id="recent-entries-content" style="display: none;">
+                            <div class="recent-entries-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="users" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Users Management</h2>
+                <div class="section-actions">
+                    <input type="text" id="user-search" placeholder="Search users..." class="search-input">
+                    <select id="user-filter" class="filter-select">
+                        <option value="">All Countries</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadUsersData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="add-user-btn" onclick="openAddUserModal()">
+                        <i class="fas fa-plus"></i> Add User
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="users-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Country</th>
+                            <th>Gender</th>
+                            <th>Registration Date</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-data">
+                        <tr>
+                            <td colspan="7" class="loading">Loading users data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section id="transactions" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-shopping-cart"></i> Transactions</h2>
+                <div class="section-actions">
+                    <input type="text" id="transaction-search" placeholder="Search transactions..." class="search-input">
+                    <select id="transaction-filter" class="filter-select">
+                        <option value="">All Payment Methods</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadTransactionsData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="transactions-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Purchase Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-data">
+                        <tr>
+                            <td colspan="6" class="loading">Loading transactions data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-box"></i> Products</h2>
+                <div class="section-actions">
+                    <input type="text" id="product-search" placeholder="Search products..." class="search-input">
+                    <select id="product-filter" class="filter-select">
+                        <option value="">All Categories</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadProductsData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="products-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-data">
+                        <tr>
+                            <td colspan="4" class="loading">Loading products data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Support Tickets Section -->
+        <section id="tickets" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-ticket-alt"></i> Support Tickets</h2>
+                <div class="section-actions">
+                    <input type="text" id="ticket-search" placeholder="Search tickets..." class="search-input">
+                    <select id="ticket-filter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadTicketsData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="tickets-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Issue Type</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tickets-data">
+                        <tr>
+                            <td colspan="5" class="loading">Loading tickets data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sessions Section -->
+        <section id="sessions" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-clock"></i> User Sessions</h2>
+                <div class="section-actions">
+                    <input type="text" id="session-search" placeholder="Search sessions..." class="search-input">
+                    <select id="session-filter" class="filter-select">
+                        <option value="">All Devices</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadSessionsData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="sessions-table" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Device</th>
+                            <th>Login Time</th>
+                            <th>Logout Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessions-data">
+                        <tr>
+                            <td colspan="5" class="loading">Loading sessions data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- User Management Modals -->
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Add New User</h3>
+                <button class="modal-close" onclick="closeAddUserModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="add-user-form" onsubmit="addUser(event)">
+                <div class="form-group">
+                    <label for="add-name">Full Name *</label>
+                    <input type="text" id="add-name" required placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label for="add-email">Email Address *</label>
+                    <input type="email" id="add-email" required placeholder="Enter email address">
+                </div>
+                <div class="form-group">
+                    <label for="add-country">Country</label>
+                    <select id="add-country">
+                        <option value="">Select Country</option>
+                        <option value="Pakistan">Pakistan</option>
+                        <option value="USA">USA</option>
+                        <option value="UK">UK</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="France">France</option>
+                        <option value="Japan">Japan</option>
+                        <option value="China">China</option>
+                        <option value="India">India</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="add-gender">Gender</label>
+                    <select id="add-gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeAddUserModal()">Cancel</button>
+                    <button type="submit" class="submit-btn">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-edit"></i> Edit User</h3>
+                <button class="modal-close" onclick="closeEditUserModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="edit-user-form" onsubmit="updateUser(event)">
+                <input type="hidden" id="edit-user-id">
+                <div class="form-group">
+                    <label for="edit-name">Full Name *</label>
+                    <input type="text" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email Address *</label>
+                    <input type="email" id="edit-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-country">Country</label>
+                    <select id="edit-country">
+                        <option value="">Select Country</option>
+                        <option value="Pakistan">Pakistan</option>
+                        <option value="USA">USA</option>
+                        <option value="UK">UK</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="France">France</option>
+                        <option value="Japan">Japan</option>
+                        <option value="China">China</option>
+                        <option value="India">India</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-gender">Gender</label>
+                    <select id="edit-gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeEditUserModal()">Cancel</button>
+                    <button type="submit" class="submit-btn">Update User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading data...</p>
+        </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="error-toast" class="error-toast">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="error-message">Error loading data</span>
+        <button onclick="hideErrorToast()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
